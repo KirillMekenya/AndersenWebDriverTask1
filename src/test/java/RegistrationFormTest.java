@@ -28,7 +28,7 @@ public class RegistrationFormTest {
     public final static String EXPECTED_HEADER = "Registration Form";
     public final static String EXPECTED_EMAIL_IVALID_MESSAGE = "Please enter a valid email address.";
     public final static String NAME = "Kirill";
-    public final static String SURNAME = "Mekenya>";
+    public final static String SURNAME = "Mekenya";
     public final static String PHONE_NUMBER = "+4827989879";
     public final static String USERNAME = "qa_user";
     public final static String INVALID_EMAIL = "qwerty";
@@ -55,7 +55,6 @@ public class RegistrationFormTest {
 
     @AfterAll
     public void finish() {
-
         driver.close();
     }
 
