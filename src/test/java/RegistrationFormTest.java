@@ -9,8 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+
+import utils.AllureWatcher;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,7 +26,7 @@ public class RegistrationFormTest {
 
     private RegistrationFormPage registrationFormPage;
 
-    private WebDriver driver;
+    private final WebDriver driver = new ChromeDriver();
 
     public final static String EXPECTED_HEADER = "Registration Form";
     public final static String EXPECTED_EMAIL_IVALID_MESSAGE = "Please enter a valid email address.";
@@ -42,10 +45,12 @@ public class RegistrationFormTest {
     @BeforeAll
     public void setup() {
         WebDriverManager.chromedriver().setup();
-        driver = new ChromeDriver();
         registrationFormPage = new RegistrationFormPage(driver);
         driver.manage().window().maximize();
     }
+
+    @RegisterExtension
+    AllureWatcher watcher = new AllureWatcher(this.driver, "target/surefire-reports");
 
     @BeforeEach
     public void initElements() {
@@ -70,14 +75,14 @@ public class RegistrationFormTest {
     @DisplayName("Проверка регистрации только с обязательными параметрамий")
     public void successRequiredFieldsRegistration() {
         registrationFormPage.inputName(NAME)
-                            .inputSurname(SURNAME)
-                            .inputPhoneNumber(PHONE_NUMBER)
-                            .selectReadingHobbyCheckbox()
-                            .inputUserName(USERNAME)
-                            .inputEmail(VALID_EMAIL)
-                            .inputPassword(PASSWORD)
-                            .inputRepeatPassword(PASSWORD)
-                            .clickSubmitButton();
+                .inputSurname(SURNAME)
+                .inputPhoneNumber(PHONE_NUMBER)
+                .selectReadingHobbyCheckbox()
+                .inputUserName(USERNAME)
+                .inputEmail(VALID_EMAIL)
+                .inputPassword(PASSWORD)
+                .inputRepeatPassword(PASSWORD)
+                .clickSubmitButton();
 
         assertFalse(registrationFormPage.isErrorDisplayed(),
                 "Регистрация завершилась неуспешно");
@@ -87,14 +92,14 @@ public class RegistrationFormTest {
     @DisplayName("Проверка регистрации с невалидной почтой")
     public void invalidEmailRegistration() {
         registrationFormPage.inputName(NAME)
-                            .inputSurname(SURNAME)
-                            .inputPhoneNumber(PHONE_NUMBER)
-                            .selectReadingHobbyCheckbox()
-                            .inputUserName(USERNAME)
-                            .inputEmail(INVALID_EMAIL)
-                            .inputPassword(PASSWORD)
-                            .inputRepeatPassword(PASSWORD)
-                            .clickSubmitButton();
+                .inputSurname(SURNAME)
+                .inputPhoneNumber(PHONE_NUMBER)
+                .selectReadingHobbyCheckbox()
+                .inputUserName(USERNAME)
+                .inputEmail(INVALID_EMAIL)
+                .inputPassword(PASSWORD)
+                .inputRepeatPassword(PASSWORD)
+                .clickSubmitButton();
 
         assertEquals(EXPECTED_EMAIL_IVALID_MESSAGE, registrationFormPage.getInvalidEmailElement().getText(),
                 "Отсутствует валидация на некорректный email некорректный текст ошибки");
@@ -104,13 +109,13 @@ public class RegistrationFormTest {
     @DisplayName("Проверка регистрации с незаполненным required полем Хобби")
     public void missedHobbyRequiredCheckbox() {
         registrationFormPage.inputName(NAME)
-                            .inputSurname(SURNAME)
-                            .inputPhoneNumber(PHONE_NUMBER)
-                            .inputUserName(USERNAME)
-                            .inputEmail(VALID_EMAIL)
-                            .inputPassword(PASSWORD)
-                            .inputRepeatPassword(PASSWORD)
-                            .clickSubmitButton();
+                .inputSurname(SURNAME)
+                .inputPhoneNumber(PHONE_NUMBER)
+                .inputUserName(USERNAME)
+                .inputEmail(VALID_EMAIL)
+                .inputPassword(PASSWORD)
+                .inputRepeatPassword(PASSWORD)
+                .clickSubmitButton();
 
         assertEquals(MISSING_REQUIRED_FIELD_MESSAGE, registrationFormPage.getMissedHobbyFieldElement().getText(),
                 "Отсутствует валидация на заполнения обязательного поля Хобби");
@@ -120,14 +125,14 @@ public class RegistrationFormTest {
     @DisplayName("Проверка регистрации с несовпадающими паролями")
     public void passwordMismatch() {
         registrationFormPage.inputName(NAME)
-                            .inputSurname(SURNAME)
-                            .inputPhoneNumber(PHONE_NUMBER)
-                            .selectReadingHobbyCheckbox()
-                            .inputUserName(USERNAME)
-                            .inputEmail(VALID_EMAIL)
-                            .inputPassword(PASSWORD)
-                            .inputRepeatPassword(REPEATED_PASSWORD)
-                            .clickSubmitButton();
+                .inputSurname(SURNAME)
+                .inputPhoneNumber(PHONE_NUMBER)
+                .selectReadingHobbyCheckbox()
+                .inputUserName(USERNAME)
+                .inputEmail(VALID_EMAIL)
+                .inputPassword(PASSWORD)
+                .inputRepeatPassword(REPEATED_PASSWORD)
+                .clickSubmitButton();
 
         //Будет патать т.к отсутствует валидация на проверку совпадения паролей
         assertTrue(registrationFormPage.isErrorDisplayed(),
@@ -138,18 +143,18 @@ public class RegistrationFormTest {
     @DisplayName("Проверка регистрации со всеми полями")
     public void allFieldsRegistration() {
         registrationFormPage.inputName(NAME)
-                            .inputSurname(SURNAME)
-                            .inputPhoneNumber(PHONE_NUMBER)
-                            .selectReadingHobbyCheckbox()
-                            .inputUserName(USERNAME)
-                            .inputEmail(VALID_EMAIL)
-                            .inputPassword(PASSWORD)
-                            .inputRepeatPassword(PASSWORD)
-                            .selectCountry(SELECTED_COUNTRY)
-                            .selectSingleStatus()
-                            .uploadPicture(PATH_TO_FILE)
-                            .inputAboutMe("It's me")
-                            .clickSubmitButton();
+                .inputSurname(SURNAME)
+                .inputPhoneNumber(PHONE_NUMBER)
+                .selectReadingHobbyCheckbox()
+                .inputUserName(USERNAME)
+                .inputEmail(VALID_EMAIL)
+                .inputPassword(PASSWORD)
+                .inputRepeatPassword(PASSWORD)
+                .selectCountry(SELECTED_COUNTRY)
+                .selectSingleStatus()
+                .uploadPicture(PATH_TO_FILE)
+                .inputAboutMe("It's me")
+                .clickSubmitButton();
 
         assertFalse(registrationFormPage.isErrorDisplayed(),
                 "Регистрация завершилась неуспешно");
