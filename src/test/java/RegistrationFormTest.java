@@ -1,5 +1,7 @@
 import elements.RegistrationFormPage;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import io.qameta.allure.Allure;
+import io.qameta.allure.Attachment;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,11 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-import utils.AllureWatcher;
+import org.openqa.selenium.logging.LogType;
+import utils.ActionsOnFailureExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -22,11 +27,12 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @TestInstance(PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ExtendWith(ActionsOnFailureExtension.class)
 public class RegistrationFormTest {
 
     private RegistrationFormPage registrationFormPage;
 
-    private final WebDriver driver = new ChromeDriver();
+    private WebDriver driver;
 
     public final static String EXPECTED_HEADER = "Registration Form";
     public final static String EXPECTED_EMAIL_IVALID_MESSAGE = "Please enter a valid email address.";
@@ -45,12 +51,26 @@ public class RegistrationFormTest {
     @BeforeAll
     public void setup() {
         WebDriverManager.chromedriver().setup();
+        driver = new ChromeDriver();
         registrationFormPage = new RegistrationFormPage(driver);
         driver.manage().window().maximize();
     }
 
-    @RegisterExtension
-    AllureWatcher watcher = new AllureWatcher(this.driver, "target/surefire-reports");
+    public void takeScreenshot() {
+        System.out.println("Taking screenshot.");
+        byte[] srcFile=((TakesScreenshot)driver).getScreenshotAs(OutputType.BYTES);
+        saveScreenshot(srcFile,  "Screenshot.png");
+    }
+
+    public void saveLogs() {
+        Allure.addAttachment("Console log: ", String.valueOf(driver.manage().logs().get(LogType.BROWSER).getAll()));
+    }
+
+    @Attachment(value = "{testName}", type = "image/png")
+    public byte[] saveScreenshot(byte[] screenShot, String testName) {
+        System.out.println("Attaching screenshot to Allure report");
+        return screenShot;
+    }
 
     @BeforeEach
     public void initElements() {
